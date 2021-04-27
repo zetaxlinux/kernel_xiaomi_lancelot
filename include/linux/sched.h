@@ -1387,6 +1387,9 @@ struct task_struct {
 	unsigned short inherit_cnt:14;
 	short nice_backup;
 	atomic_t inherit_types;
+
+#ifdef CONFIG_ANDROID_SIMPLE_LMK
+	struct task_struct		*simple_lmk_next;
 #endif
 
 	/*
