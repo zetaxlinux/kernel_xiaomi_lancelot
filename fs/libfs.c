@@ -1227,38 +1227,12 @@ bool is_empty_dir_inode(struct inode *inode)
 }
 
 #ifdef CONFIG_UNICODE
-<<<<<<< HEAD
 bool needs_casefold(const struct inode *dir)
 {
 	return IS_CASEFOLDED(dir) && dir->i_sb->s_encoding &&
 			(!IS_ENCRYPTED(dir) || fscrypt_has_encryption_key(dir));
 }
 EXPORT_SYMBOL(needs_casefold);
-
-int generic_ci_d_compare(const struct dentry *dentry, unsigned int len,
-			  const char *str, const struct qstr *name)
-{
-	const struct dentry *parent = READ_ONCE(dentry->d_parent);
-	const struct inode *inode = READ_ONCE(parent->d_inode);
-	const struct super_block *sb = dentry->d_sb;
-	const struct unicode_map *um = sb->s_encoding;
-	struct qstr entry = QSTR_INIT(str, len);
-	char strbuf[DNAME_INLINE_LEN];
-	int ret;
-
-	if (!inode || !needs_casefold(inode))
-		goto fallback;
-
-=======
-/*
- * Determine if the name of a dentry should be casefolded.
- *
- * Return: if names will need casefolding
- */
-static bool needs_casefold(const struct inode *dir)
-{
-	return IS_CASEFOLDED(dir) && dir->i_sb->s_encoding;
-}
 
 /**
  * generic_ci_d_compare - generic d_compare implementation for casefolding filesystems
@@ -1282,7 +1256,6 @@ static int generic_ci_d_compare(const struct dentry *dentry, unsigned int len,
 
 	if (!dir || !needs_casefold(dir))
 		goto fallback;
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 	/*
 	 * If the dentry name is stored in-line, then it may be concurrently
 	 * modified by a rename.  If this happens, the VFS will eventually retry
@@ -1293,18 +1266,7 @@ static int generic_ci_d_compare(const struct dentry *dentry, unsigned int len,
 	if (len <= DNAME_INLINE_LEN - 1) {
 		memcpy(strbuf, str, len);
 		strbuf[len] = 0;
-<<<<<<< HEAD
-		entry.name = strbuf;
-		/* prevent compiler from optimizing out the temporary buffer */
-		barrier();
-	}
 
-	ret = utf8_strncasecmp(um, name, &entry);
-	if (ret >= 0)
-		return ret;
-
-	if (sb_has_enc_strict_mode(sb))
-=======
 		qstr.name = strbuf;
 		/* prevent compiler from optimizing out the temporary buffer */
 		barrier();
@@ -1314,20 +1276,18 @@ static int generic_ci_d_compare(const struct dentry *dentry, unsigned int len,
 		return ret;
 
 	if (sb_has_strict_encoding(sb))
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 		return -EINVAL;
 fallback:
 	if (len != name->len)
 		return 1;
 	return !!memcmp(str, name->name, len);
 }
-<<<<<<< HEAD
+
 EXPORT_SYMBOL(generic_ci_d_compare);
 
 int generic_ci_d_hash(const struct dentry *dentry, struct qstr *str)
 {
 	const struct inode *inode = READ_ONCE(dentry->d_inode);
-=======
 
 /**
  * generic_ci_d_hash - generic d_hash implementation for casefolding filesystems
@@ -1339,29 +1299,10 @@ int generic_ci_d_hash(const struct dentry *dentry, struct qstr *str)
 static int generic_ci_d_hash(const struct dentry *dentry, struct qstr *str)
 {
 	const struct inode *dir = READ_ONCE(dentry->d_inode);
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 	struct super_block *sb = dentry->d_sb;
 	const struct unicode_map *um = sb->s_encoding;
 	int ret = 0;
 
-<<<<<<< HEAD
-	if (!inode || !needs_casefold(inode))
-		return 0;
-
-	ret = utf8_casefold_hash(um, dentry, str);
-	if (ret < 0)
-		goto err;
-
-	return 0;
-err:
-	if (sb_has_enc_strict_mode(sb))
-		ret = -EINVAL;
-	else
-		ret = 0;
-	return ret;
-}
-EXPORT_SYMBOL(generic_ci_d_hash);
-=======
 	if (!dir || !needs_casefold(dir))
 		return 0;
 
@@ -1370,7 +1311,6 @@ EXPORT_SYMBOL(generic_ci_d_hash);
 		return -EINVAL;
 	return 0;
 }
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 
 static const struct dentry_operations generic_ci_dentry_ops = {
 	.d_hash = generic_ci_d_hash,
@@ -1384,11 +1324,7 @@ static const struct dentry_operations generic_encrypted_dentry_ops = {
 };
 #endif
 
-<<<<<<< HEAD
-#if IS_ENABLED(CONFIG_UNICODE) && IS_ENABLED(CONFIG_FS_ENCRYPTION)
-=======
 #if defined(CONFIG_FS_ENCRYPTION) && defined(CONFIG_UNICODE)
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 static const struct dentry_operations generic_encrypted_ci_dentry_ops = {
 	.d_hash = generic_ci_d_hash,
 	.d_compare = generic_ci_d_compare,
@@ -1398,24 +1334,6 @@ static const struct dentry_operations generic_encrypted_ci_dentry_ops = {
 
 /**
  * generic_set_encrypted_ci_d_ops - helper for setting d_ops for given dentry
-<<<<<<< HEAD
- * @dir:	parent of dentry whose ops to set
- * @dentry:	detnry to set ops on
- *
- * This function sets the dentry ops for the given dentry to handle both
- * casefolding and encryption of the dentry name.
- */
-void generic_set_encrypted_ci_d_ops(struct inode *dir, struct dentry *dentry)
-{
-#ifdef CONFIG_FS_ENCRYPTION
-	if (dentry->d_flags & DCACHE_ENCRYPTED_NAME) {
-#ifdef CONFIG_UNICODE
-		if (dir->i_sb->s_encoding) {
-			d_set_d_op(dentry, &generic_encrypted_ci_dentry_ops);
-			return;
-		}
-#endif
-=======
  * @dentry:	dentry to set ops on
  *
  * Casefolded directories need d_hash and d_compare set, so that the dentries
@@ -1452,17 +1370,12 @@ void generic_set_encrypted_ci_d_ops(struct dentry *dentry)
 #endif
 #ifdef CONFIG_FS_ENCRYPTION
 	if (needs_encrypt_ops) {
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 		d_set_d_op(dentry, &generic_encrypted_dentry_ops);
 		return;
 	}
 #endif
 #ifdef CONFIG_UNICODE
-<<<<<<< HEAD
-	if (dir->i_sb->s_encoding) {
-=======
 	if (needs_ci_ops) {
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 		d_set_d_op(dentry, &generic_ci_dentry_ops);
 		return;
 	}
