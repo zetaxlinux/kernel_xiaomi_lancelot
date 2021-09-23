@@ -1314,11 +1314,7 @@ extern int send_sigurg(struct fown_struct *fown);
 /* These flags relate to encoding and casefolding */
 #define SB_ENC_STRICT_MODE_FL	(1 << 0)
 
-<<<<<<< HEAD
-#define sb_has_enc_strict_mode(sb) \
-=======
 #define sb_has_strict_encoding(sb) \
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 	(sb->s_encoding_flags & SB_ENC_STRICT_MODE_FL)
 
 /*
@@ -3238,11 +3234,7 @@ extern int generic_file_fsync(struct file *, loff_t, loff_t, int);
 
 extern int generic_check_addressable(unsigned, u64);
 
-<<<<<<< HEAD
 #ifdef CONFIG_UNICODE
-extern int generic_ci_d_hash(const struct dentry *dentry, struct qstr *str);
-extern int generic_ci_d_compare(const struct dentry *dentry, unsigned int len,
-				const char *str, const struct qstr *name);
 extern bool needs_casefold(const struct inode *dir);
 #else
 static inline bool needs_casefold(const struct inode *dir)
@@ -3250,11 +3242,7 @@ static inline bool needs_casefold(const struct inode *dir)
 	return 0;
 }
 #endif
-extern void generic_set_encrypted_ci_d_ops(struct inode *dir,
-					   struct dentry *dentry);
-=======
 extern void generic_set_encrypted_ci_d_ops(struct dentry *dentry);
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 
 #ifdef CONFIG_MIGRATION
 extern int buffer_migrate_page(struct address_space *,
