@@ -271,7 +271,7 @@ static void f2fs_post_read_work(struct work_struct *work)
 static void f2fs_read_end_io(struct bio *bio)
 {
 	struct page *first_page = bio->bi_io_vec[0].bv_page;
-	struct f2fs_sb_info *sbi = F2FS_P_SB(bio->bi_io_vec->bv_page);
+	struct f2fs_sb_info *sbi = F2FS_P_SB(first_page);
 	struct bio_post_read_ctx *ctx;
 
 	iostat_update_and_unbind_ctx(bio, 0);
@@ -1048,7 +1048,7 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
 	bio->bi_end_io = f2fs_read_end_io;
 	bio_set_op_attrs(bio, REQ_OP_READ, op_flag);
 
-	if (f2fs_encrypted_file(inode))
+	if (fscrypt_inode_uses_fs_layer_crypto(inode))
 		post_read_steps |= STEP_DECRYPT;
 
 	if (f2fs_need_verity(inode, first_idx))
@@ -2506,7 +2506,7 @@ next_page:
 		__f2fs_submit_read_bio(F2FS_I_SB(inode), bio, DATA);
 
 	if (pages && is_readahead && !drop_ra)
-		WRITE_ONCE(F2FS_I(inode)->ra_offset, -1;
+		WRITE_ONCE(F2FS_I(inode)->ra_offset, -1);
 	return pages ? 0 : ret;
 }
 
