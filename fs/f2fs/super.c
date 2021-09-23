@@ -967,9 +967,7 @@ static int parse_options(struct super_block *sb, char *options, bool is_remount)
 			kfree(name);
 			break;
 		case Opt_fsync:
-<<<<<<< HEAD
 			f2fs_info(sbi, "changing fsync mode not supported");
-=======
 			name = match_strdup(&args[0]);
 			if (!name)
 				return -ENOMEM;
@@ -985,7 +983,6 @@ static int parse_options(struct super_block *sb, char *options, bool is_remount)
 				return -EINVAL;
 			}
 			kfree(name);
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 			break;
 		case Opt_test_dummy_encryption:
 			ret = f2fs_set_test_dummy_encryption(sb, p, &args[0],
@@ -2096,10 +2093,9 @@ restore_flag:
 
 static void f2fs_enable_checkpoint(struct f2fs_sb_info *sbi)
 {
-<<<<<<< HEAD
 	/* we should flush all the data to keep data consistency */
 	sync_inodes_sb(sbi->sb);
-=======
+
 	int retry = DEFAULT_RETRY_IO_COUNT;
 
 	/* we should flush all the data to keep data consistency */
@@ -2111,7 +2107,6 @@ static void f2fs_enable_checkpoint(struct f2fs_sb_info *sbi)
 
 	if (unlikely(retry < 0))
 		f2fs_warn(sbi, "checkpoint=enable has some unwritten data.");
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 
 	down_write(&sbi->gc_lock);
 	f2fs_dirty_to_prefree(sbi);
@@ -4383,10 +4378,7 @@ free_bio_info:
 
 #ifdef CONFIG_UNICODE
 	utf8_unload(sb->s_encoding);
-<<<<<<< HEAD
-=======
 	sb->s_encoding = NULL;
->>>>>>> e367cc29397c5dc5d2c63a472287d1eeaf14e0b5
 #endif
 free_options:
 #ifdef CONFIG_QUOTA
