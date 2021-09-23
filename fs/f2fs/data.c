@@ -1048,11 +1048,6 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
 	bio->bi_end_io = f2fs_read_end_io;
 	bio_set_op_attrs(bio, REQ_OP_READ, op_flag);
 
-	if (fscrypt_inode_uses_fs_layer_crypto(inode))
-		post_read_steps |= 1 << STEP_DECRYPT;
-	if (f2fs_compressed_file(inode))
-		post_read_steps |= 1 << STEP_DECOMPRESS_NOWQ;
-
 	if (f2fs_encrypted_file(inode))
 		post_read_steps |= STEP_DECRYPT;
 
