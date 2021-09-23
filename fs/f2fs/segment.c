@@ -4206,6 +4206,7 @@ static int build_sit_entries(struct f2fs_sb_info *sbi)
 					sbi->discard_blks +=
 						sbi->blocks_per_seg -
 						se->valid_blocks;
+				}
 			}
 
 			if (__is_large_section(sbi))
