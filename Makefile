@@ -705,6 +705,16 @@ KBUILD_CFLAGS += $(call cc-ifversion, -gt, 0900, \
 KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
 			$(call cc-disable-warning,maybe-uninitialized,))
 
+# Enable Clang Polly optimizations
+KBUILD_CFLAGS	+= -mllvm -polly \
+		   -mllvm -polly-run-dce \
+		   -mllvm -polly-run-inliner \
+		   -mllvm -polly-opt-fusion=max \
+		   -mllvm -polly-ast-use-context \
+		   -mllvm -polly-detect-keep-going \
+		   -mllvm -polly-vectorizer=stripmine \
+		   -mllvm -polly-invariant-load-hoisting
+
 ifeq ($(cc-name),clang)
 KBUILD_CFLAGS   += -mcpu=cortex-a55 -mtune=cortex-a55
 endif
