@@ -155,5 +155,4 @@ obj-$(CONFIG_CRYPTO_ABLK_HELPER) += ablk_helper.o
 crypto_simd-y := simd.o
 obj-$(CONFIG_CRYPTO_SIMD) += crypto_simd.o
 
-# Squeeze a little bit more juice from GCC
 ccflags-y := -O3
