@@ -23,18 +23,18 @@
  * tunables
  */
 /* max queue in one round of service */
-static const int cfq_quantum = 16;
-static const u64 cfq_fifo_expire[2] = { NSEC_PER_SEC / 4, NSEC_PER_SEC / 8 };
+static const int cfq_quantum = 4;
+static const u64 cfq_fifo_expire[2] = { 80, 330 };
 /* maximum backwards seek, in KiB */
-static const int cfq_back_max = 16 * 1024;
+static const int cfq_back_max = 12582912;
 /* penalty of a backwards seek */
 static const int cfq_back_penalty = 1;
-static const u64 cfq_slice_sync = NSEC_PER_SEC / 10;
-static u64 cfq_slice_async = NSEC_PER_SEC / 25;
+static const u64 cfq_slice_sync = 60;
+static u64 cfq_slice_async = 50;
 static const int cfq_slice_async_rq = 2;
-static u64 cfq_slice_idle = NSEC_PER_SEC / 125;
-static u64 cfq_group_idle = NSEC_PER_SEC / 125;
-static const u64 cfq_target_latency = (u64)NSEC_PER_SEC * 3/10; /* 300 ms */
+static u64 cfq_slice_idle = 0;
+static u64 cfq_group_idle = 0;
+static const u64 cfq_target_latency = 300; /* 300 ms */
 static const int cfq_hist_divisor = 4;
 
 /*
@@ -659,6 +659,8 @@ static inline void cfqg_put(struct cfq_group *cfqg)
 }
 
 #define cfq_log_cfqq(cfqd, cfqq, fmt, args...)	do {			\
+	if (likely(!blk_trace_note_message_enabled((bfqd)->queue)))	\
+		break;							\
 	blk_add_cgroup_trace_msg((cfqd)->queue,				\
 			cfqg_to_blkg((cfqq)->cfqg)->blkcg,		\
 			"cfq%d%c%c " fmt, (cfqq)->pid,			\
@@ -668,6 +670,8 @@ static inline void cfqg_put(struct cfq_group *cfqg)
 } while (0)
 
 #define cfq_log_cfqg(cfqd, cfqg, fmt, args...)	do {			\
+	if (likely(!blk_trace_note_message_enabled((bfqd)->queue)))     \
+                break;                                                  \
 	blk_add_cgroup_trace_msg((cfqd)->queue,				\
 			cfqg_to_blkg(cfqg)->blkcg, fmt, ##args);	\
 } while (0)
